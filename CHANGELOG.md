@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.1.2] 2025-06-18
+
+- Test release action
+
 ## [1.1.1] 2025-06-18
 
 - Update dependencies
