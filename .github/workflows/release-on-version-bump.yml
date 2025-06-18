@@ -63,8 +63,16 @@ jobs:
           sed -i 's/x86_64.tar.gz/archlinux-x86_64.tar.gz/' target/cargo-aur/PKGBUILD
           sha256sum target/cargo-aur/rust-motd-${{ steps.version.outputs.new }}-archlinux-x86_64.tar.gz > target/cargo-aur/rust-motd-${{ steps.version.outputs.new }}-archlinux-x86_64.tar.gz.sha256
 
+      - name: Generate .SRCINFO
+        uses: heyhusen/archlinux-package-action@v2
+        with:
+          path: target/cargo-aur/
+          flags: ''
+          namcap: false
+          srcinfo: true
+
       - name: List generated packages
-        run: ls -lh target/{debian,cargo-aur}
+        run: ls -lha target/{debian,cargo-aur}
 
       - name: Create tag and release
         if: steps.version.outputs.old != steps.version.outputs.new
@@ -78,23 +86,31 @@ jobs:
             target/cargo-aur/*.tar.*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Publish to AUR
-        if: steps.version.outputs.old != steps.version.outputs.new
-        env:
-          AUR_REPO: rust-motd-bin-test
-          SSH_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
-        run: |
-          # Set up SSH key
-          mkdir -p ~/.ssh
-          echo "$SSH_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          echo -e "Host aur.archlinux.org\n  IdentityFile ~/.ssh/id_rsa\n  StrictHostKeyChecking no" >> ~/.ssh/config
+      - name: Push changes to AUR
+        uses: datakrama/push-aur-action@v1
+        with:
+          path: target/cargo-aur/
+          pkgname: 'rust-motd-bin-test'
+          git_username: ${{ secrets.GIT_USERNAME }}
+          git_email: ${{ secrets.GIT_EMAIL }}
+          private_ssh_key: ${{ secrets.AUR_PRIVATE_SSH_KEY }}
+      # - name: Publish to AUR
+      #   if: steps.version.outputs.old != steps.version.outputs.new
+      #   env:
+      #     AUR_REPO: rust-motd-bin-test
+      #     SSH_KEY: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+      #   run: |
+      #     # Set up SSH key
+      #     mkdir -p ~/.ssh
+      #     echo "$SSH_KEY" > ~/.ssh/id_rsa
+      #     chmod 600 ~/.ssh/id_rsa
+      #     echo -e "Host aur.archlinux.org\n  IdentityFile ~/.ssh/id_rsa\n  StrictHostKeyChecking no" >> ~/.ssh/config
 
-          cd target/cargo-aur
-          git clone  ssh://aur@aur.archlinux.org/$AUR_REPO.git
-          cp PKGBUILD $AUR_REPO
-          makepkg --printsrcinfo > $AUR_REPO/.SRCINFO
-          cd $AUR_REPO
-          git add PKGBUILD .SRCINFO
-          git commit "Update to ${{ steps.version.outputs.new }}"
-          git push
+      #     cd target/cargo-aur
+      #     git clone  ssh://aur@aur.archlinux.org/$AUR_REPO.git
+      #     cp PKGBUILD $AUR_REPO
+      #     cp .SRCINFO $AUR_REPO
+      #     cd $AUR_REPO
+      #     git add PKGBUILD .SRCINFO
+      #     git commit "Update to ${{ steps.version.outputs.new }}"
+      #     git push
