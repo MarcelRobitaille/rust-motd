@@ -4,6 +4,10 @@
 
 - This shouldn't show up
 
+## [1.1.4] 2025-06-18
+
+- Test aur release
+
 ## [1.1.3] 2025-06-18
 
 - Test release action yas
