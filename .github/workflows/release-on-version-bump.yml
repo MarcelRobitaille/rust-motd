@@ -57,11 +57,13 @@ jobs:
         run: cargo deb
 
       - name: Build Arch Linux package
-        run: cargo aur build
+        run: |
+          cargo aur build
+          mv target/cargo-aur/rust-motd-${{ steps.version.outputs.new }}-{,cargo-aur-}x86_64.tar.gz
+          sha256sum target/cargo-aur/rust-motd-${{ steps.version.outputs.new }}-cargo-aur-x86_64.tar.gz > target/cargo-aur/rust-motd-${{ steps.version.outputs.new }}-cargo-aur-x86_64.tar.gz.sha256
 
       - name: List generated packages
-        # run: ls -lh target/{debian,arch}
-        run: find target
+        run: ls -lh target/{debian,cargo-aur}
 
       - name: Create tag and release
         if: steps.version.outputs.old != steps.version.outputs.new
@@ -72,6 +74,6 @@ jobs:
           body: ${{ env.RELEASE_NOTES }}
           files: |
             target/debian/*.deb
-            target/arch/*.pkg.tar.zst
+            target/cargo-aur/*.tar.*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
