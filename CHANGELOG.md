@@ -4,6 +4,10 @@
 
 - This shouldn't show up
 
+## [1.1.5] 2025-06-18
+
+- Test aur push
+
 ## [1.1.4] 2025-06-18
 
 - Test aur release

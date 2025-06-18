@@ -90,5 +90,11 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           echo -e "Host aur.archlinux.org\n  IdentityFile ~/.ssh/id_rsa\n  StrictHostKeyChecking no" >> ~/.ssh/config
 
-          # Publish using cargo aur
-          cargo aur publish --pkgname "$AUR_REPO" --ssh
+          cd target/cargo-aur
+          git clone  ssh://aur@aur.archlinux.org/$AUR_REPO.git
+          cp PKGBUILD $AUR_REPO
+          makepkg --printsrcinfo > $AUR_REPO/.SRCINFO
+          cd $AUR_REPO
+          git add PKGBUILD .SRCINFO
+          git commit "Update to ${{ steps.version.outputs.new }}"
+          git push
