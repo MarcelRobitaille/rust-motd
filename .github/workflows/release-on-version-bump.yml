@@ -60,7 +60,8 @@ jobs:
         run: cargo aur build
 
       - name: List generated packages
-        run: ls -lh target/{debian,arch}
+        # run: ls -lh target/{debian,arch}
+        run: find target
 
       - name: Create tag and release
         if: steps.version.outputs.old != steps.version.outputs.new
