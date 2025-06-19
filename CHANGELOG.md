@@ -4,6 +4,10 @@
 
 - This shouldn't show up
 
+## [1.1.8] 2025-06-18
+
+- Try new aur
+
 ## [1.1.7] 2025-06-18
 
 - Test aur push again again

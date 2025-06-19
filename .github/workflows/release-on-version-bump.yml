@@ -63,13 +63,13 @@ jobs:
           sed -i 's/x86_64.tar.gz/archlinux-x86_64.tar.gz/' target/cargo-aur/PKGBUILD
           sha256sum target/cargo-aur/rust-motd-${{ steps.version.outputs.new }}-archlinux-x86_64.tar.gz > target/cargo-aur/rust-motd-${{ steps.version.outputs.new }}-archlinux-x86_64.tar.gz.sha256
 
-      - name: Generate .SRCINFO
-        uses: heyhusen/archlinux-package-action@v2
-        with:
-          path: target/cargo-aur/
-          flags: ''
-          namcap: false
-          srcinfo: true
+      # - name: Generate .SRCINFO
+      #   uses: heyhusen/archlinux-package-action@v2
+      #   with:
+      #     path: target/cargo-aur/
+      #     flags: ''
+      #     namcap: false
+      #     srcinfo: true
 
       - name: List generated packages
         run: ls -lha target/{debian,cargo-aur}
@@ -86,14 +86,23 @@ jobs:
             target/cargo-aur/*.tar.*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Push changes to AUR
-        uses: datakrama/push-aur-action@v1
+      - name: Publish AUR package
+        uses: KSXGitHub/github-actions-deploy-aur@v4.1.1
         with:
-          path: target/cargo-aur/
-          pkgname: 'rust-motd-bin-test'
-          git_username: ${{ secrets.GIT_USERNAME }}
-          git_email: ${{ secrets.GIT_EMAIL }}
-          private_ssh_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+          pkgname: rust-motd-bin-test
+          pkgbuild: ./target/cargo-aur/PKGBUILD
+          commit_username: ${{ secrets.GIT_USERNAME }}
+          commit_email: ${{ secrets.GIT_EMAIL }}
+          ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+          commit_message: Update AUR package
+      # - name: Push changes to AUR
+      #   uses: datakrama/push-aur-action@v1
+      #   with:
+      #     path: target/cargo-aur/
+      #     pkgname: 'rust-motd-bin-test'
+      #     git_username: ${{ secrets.GIT_USERNAME }}
+      #     git_email: ${{ secrets.GIT_EMAIL }}
+      #     private_ssh_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
       # - name: Publish to AUR
       #   if: steps.version.outputs.old != steps.version.outputs.new
       #   env:
